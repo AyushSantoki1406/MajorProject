@@ -1,0 +1,68 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+build/
+ios/Flutter/.symlinks
+.flutter-*
+.melody/
+.idea/
+.vscode/
+
+# Environment-specific
+.env
+*.env
+*.iml
+
+# Android
+android/.gradle/
+android/app/debug/
+android/app/profile/
+android/app/release/
+android/local.properties
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Runner.xcworkspace/
+
+# macOS
+macos/Flutter/ephemeral/
+macos/Pods/
+macos/Runner.xcworkspace/
+
+# Windows
+windows/flutter/ephemeral/
+
+# Web
+web/compiled.dart.js
+
+# Linux
+linux/flutter/ephemeral/
+
+# Other
+**/*.log
+*.lock
+*.DS_Store
+*.swp
+*.tmp
+*.bak
+
+# Firebase/Crashlytics
+firebase_app_id_file.json
+
+# Symbol files
+*.symbols
+
+# Coverage
+coverage/
+
+# IDE settings
+.idea/
+.vscode/
+*.iml
