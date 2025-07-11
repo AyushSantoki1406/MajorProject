@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
       } catch (e) {
         print('Navigation error: $e');
       }
-    }); 
+    });
   }
 
   @override

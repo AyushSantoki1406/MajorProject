@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -57,14 +58,23 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<firebase_auth_provider.UserCredential> signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
         clientId:
             '527365810877-con3t0b4s54ibgasvhcldg36t47esupo.apps.googleusercontent.com',
       );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        throw Exception('Google sign-in cancelled');
+      }
       final GoogleSignInAuthentication googleAuth =
-          await googleUser!.authentication;
+          await googleUser.authentication;
       final credential = firebase_auth_provider.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -72,6 +82,9 @@ class _LoginScreenState extends State<LoginScreen> {
       return await firebase_auth_provider.FirebaseAuth.instance
           .signInWithCredential(credential);
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       Fluttertoast.showToast(
         msg: 'Google sign-in failed: $e',
         backgroundColor: Colors.red,
@@ -250,7 +263,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 25),
                 ElevatedButton(
                   onPressed:
-                      authProvider.isLoading
+                      _isLoading || authProvider.isLoading
                           ? null
                           : () async {
                             if (_emailController.text.trim().isEmpty ||
@@ -263,6 +276,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                               return;
                             }
+                            setState(() {
+                              _isLoading = true;
+                            });
                             try {
                               final userCredential =
                                   await firebase_auth_provider
@@ -296,6 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               setState(() {
                                 _emailController.clear();
                                 _passwordController.clear();
+                                _isLoading = false;
                               });
 
                               if (e.code == 'wrong-password' ||
@@ -308,7 +325,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   textColor: Colors.white,
                                   fontSize: 16.0,
                                 );
-                                return; // 🚨 Important: Prevent further execution
                               } else {
                                 print('❌ Other FirebaseAuth error: ${e.code}');
                                 Fluttertoast.showToast(
@@ -317,9 +333,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   textColor: Colors.white,
                                   fontSize: 16.0,
                                 );
-                                return;
                               }
                             } catch (e) {
+                              setState(() {
+                                _isLoading = false;
+                              });
                               print('❌ Unexpected login error: $e');
                               Fluttertoast.showToast(
                                 msg: 'Login failed. Please try again.',
@@ -327,7 +345,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 textColor: Colors.white,
                                 fontSize: 16.0,
                               );
-                              return;
                             }
                           },
                   style: ElevatedButton.styleFrom(
@@ -341,9 +358,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     minimumSize: const Size(double.infinity, 0),
                   ),
                   child:
-                      authProvider.isLoading
-                          ? const CircularProgressIndicator(
-                            color: Color(0xFF6949FF),
+                      _isLoading
+                          ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
                           )
                           : const Text(
                             'Login',
@@ -356,53 +378,55 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                 ),
                 const SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        try {
-                          final userCredential = await signInWithGoogle();
-                          final user = userCredential.user;
-                          if (user != null && user.email != null) {
-                            await _saveCredentials();
-                            Fluttertoast.showToast(
-                              msg:
-                                  'Google login successful! Email: ${user.email}',
-                              backgroundColor: Colors.green,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                            Navigator.pushReplacementNamed(context, '/home');
-                          }
-                        } catch (e) {
-                          // Error handled in signInWithGoogle
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.g_mobiledata,
-                        color: Color.fromARGB(255, 0, 0, 0),
-                      ),
-                      label: const Text(
-                        'Sign in with Google',
-                        style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          255,
-                          255,
-                          255,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                  ),
-                ),
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: ElevatedButton.icon(
+                //     onPressed:
+                //         _isLoading || authProvider.isLoading
+                //             ? null
+                //             : () async {
+                //               try {
+                //                 final userCredential = await signInWithGoogle();
+                //                 final user = userCredential.user;
+                //                 if (user != null && user.email != null) {
+                //                   await _saveCredentials();
+                //                   Fluttertoast.showToast(
+                //                     msg:
+                //                         'Google login successful! Email: ${user.email}',
+                //                     backgroundColor: Colors.green,
+                //                     textColor: Colors.white,
+                //                     fontSize: 16.0,
+                //                   );
+                //                   Navigator.pushReplacementNamed(
+                //                     context,
+                //                     '/home',
+                //                   );
+                //                 }
+                //               } catch (e) {
+                //                 // Error handled in signInWithGoogle
+                //               } finally {
+                //                 setState(() {
+                //                   _isLoading = false;
+                //                 });
+                //               }
+                //             },
+                //     icon: const Icon(
+                //       Icons.g_mobiledata,
+                //       color: Color.fromARGB(255, 0, 0, 0),
+                //     ),
+                //     label: const Text(
+                //       'Sign in with Google',
+                //       style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                //     ),
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(8),
+                //       ),
+                //       padding: const EdgeInsets.symmetric(vertical: 14),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 15),
                 Center(
                   child: GestureDetector(

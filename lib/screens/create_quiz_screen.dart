@@ -129,7 +129,9 @@ class _CreateQuizScreenState extends State<CreateQuizScreen> {
             });
           },
           menuStyle: MenuStyle(
-            backgroundColor: WidgetStateProperty.all(const Color(0xFF1A1A1A)),
+            backgroundColor: WidgetStateProperty.all(
+              const Color.fromARGB(255, 255, 255, 255),
+            ),
             elevation: WidgetStateProperty.all(8),
           ),
         ),
@@ -789,7 +791,7 @@ class _CreateQuizScreenState extends State<CreateQuizScreen> {
                                         menuStyle: MenuStyle(
                                           backgroundColor:
                                               WidgetStateProperty.all(
-                                                const Color(0xFF1A1A1A),
+                                                const Color.fromARGB(255, 255, 255, 255),
                                               ),
                                           elevation: WidgetStateProperty.all(8),
                                         ),
@@ -955,7 +957,7 @@ class _CreateQuizScreenState extends State<CreateQuizScreen> {
                                         menuStyle: MenuStyle(
                                           backgroundColor:
                                               WidgetStateProperty.all(
-                                                const Color(0xFF1A1A1A),
+                                                const Color.fromARGB(255, 255, 255, 255),
                                               ),
                                           elevation: WidgetStateProperty.all(8),
                                         ),

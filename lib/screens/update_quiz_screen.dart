@@ -22,6 +22,8 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
   late TextEditingController _topicController;
   late TextEditingController _attemptLimitController;
   late List<Map<String, dynamic>> _questions;
+  late List<TextEditingController> _questionControllers;
+  late List<List<TextEditingController>> _optionControllers;
   bool _isLoading = false;
   final Color primaryColor = const Color(0xFF7C4DFF);
 
@@ -42,16 +44,21 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
             'type': q.type,
             'options': List<String>.from(q.options ?? ['', '', '', '']),
             'correctAnswer': q.correctAnswer ?? '',
-            'controller': TextEditingController(text: q.question),
-            'optionControllers':
-                (q.type == 'true_false'
-                        ? ['True', 'False']
-                        : List<String>.from(q.options ?? ['', '', '', '']))
-                    .map((opt) {
-                      return TextEditingController(text: opt);
-                    })
-                    .toList(),
           };
+        }).toList();
+
+    _questionControllers =
+        widget.quiz.questions
+            .map((q) => TextEditingController(text: q.question))
+            .toList();
+
+    _optionControllers =
+        widget.quiz.questions.map((q) {
+          return (q.type == 'true_false'
+                  ? ['True', 'False']
+                  : List<String>.from(q.options ?? ['', '', '', '']))
+              .map((opt) => TextEditingController(text: opt))
+              .toList();
         }).toList();
   }
 
@@ -62,25 +69,27 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
         'type': 'mcq',
         'options': ['', '', '', ''],
         'correctAnswer': 'Option 1',
-        'controller': TextEditingController(),
-        'optionControllers': [
-          TextEditingController(),
-          TextEditingController(),
-          TextEditingController(),
-          TextEditingController(),
-        ],
       });
+      _questionControllers.add(TextEditingController());
+      _optionControllers.add([
+        TextEditingController(),
+        TextEditingController(),
+        TextEditingController(),
+        TextEditingController(),
+      ]);
     });
   }
 
   void _removeQuestion(int index) {
     setState(() {
       if (_questions.length > 1) {
-        _questions[index]['controller'].dispose();
-        for (var controller in _questions[index]['optionControllers']) {
+        _questionControllers[index].dispose();
+        for (var controller in _optionControllers[index]) {
           controller.dispose();
         }
         _questions.removeAt(index);
+        _questionControllers.removeAt(index);
+        _optionControllers.removeAt(index);
       } else {
         Fluttertoast.showToast(
           msg: 'At least one question is required',
@@ -236,6 +245,7 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                       const SizedBox(height: 20),
                       TextField(
                         controller: _subjectController,
+                        enabled: false,
                         decoration: InputDecoration(
                           labelText: 'Subject',
                           labelStyle: const TextStyle(
@@ -406,9 +416,11 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                           ),
                                           const SizedBox(height: 12),
                                           TextField(
-                                            controller: question['controller'],
+                                            controller:
+                                                _questionControllers[index],
                                             onChanged: (value) {
-                                              question['question'] = value;
+                                              _questions[index]['question'] =
+                                                  value;
                                               setState(() {});
                                             },
                                             decoration: InputDecoration(
@@ -558,38 +570,79 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                                   ];
                                                   question['correctAnswer'] =
                                                       'True';
-                                                  question['optionControllers'] =
-                                                      [
-                                                        TextEditingController(
-                                                          text: 'True',
-                                                        ),
-                                                        TextEditingController(
-                                                          text: 'False',
-                                                        ),
-                                                      ];
-                                                } else {
-                                                  question['options'] = [
-                                                    '',
-                                                    '',
-                                                    '',
-                                                    '',
+                                                  _optionControllers[index] = [
+                                                    TextEditingController(
+                                                      text: 'True',
+                                                    ),
+                                                    TextEditingController(
+                                                      text: 'False',
+                                                    ),
                                                   ];
+                                                } else {
+                                                  // Preserve existing option texts if available
+                                                  question['options'] = [
+                                                    _optionControllers[index][0]
+                                                            .text
+                                                            .isNotEmpty
+                                                        ? _optionControllers[index][0]
+                                                            .text
+                                                        : '',
+                                                    _optionControllers[index][1]
+                                                            .text
+                                                            .isNotEmpty
+                                                        ? _optionControllers[index][1]
+                                                            .text
+                                                        : '',
+                                                    _optionControllers[index][2]
+                                                            .text
+                                                            .isNotEmpty
+                                                        ? _optionControllers[index][2]
+                                                            .text
+                                                        : '',
+                                                    _optionControllers[index][3]
+                                                            .text
+                                                            .isNotEmpty
+                                                        ? _optionControllers[index][3]
+                                                            .text
+                                                        : '',
+                                                  ];
+                                                  // Set correctAnswer to first non-empty option or 'Option 1' if all empty
                                                   question['correctAnswer'] =
-                                                      'Option 1';
-                                                  question['optionControllers'] =
-                                                      [
-                                                        TextEditingController(),
-                                                        TextEditingController(),
-                                                        TextEditingController(),
-                                                        TextEditingController(),
-                                                      ];
+                                                      question['options']
+                                                              .asMap()
+                                                              .entries
+                                                              .any(
+                                                                (entry) =>
+                                                                    entry
+                                                                        .value
+                                                                        .isNotEmpty,
+                                                              )
+                                                          ? 'Option 1'
+                                                          : '';
+                                                  _optionControllers[index] =
+                                                      question['options']
+                                                          .asMap()
+                                                          .entries
+                                                          .map(
+                                                            (
+                                                              entry,
+                                                            ) => TextEditingController(
+                                                              text: entry.value,
+                                                            ),
+                                                          )
+                                                          .toList();
                                                 }
                                               });
                                             },
                                             menuStyle: MenuStyle(
                                               backgroundColor:
                                                   WidgetStateProperty.all(
-                                                    const Color(0xFF1A1A1A),
+                                                    const Color.fromARGB(
+                                                      255,
+                                                      255,
+                                                      255,
+                                                      255,
+                                                    ),
                                                   ),
                                               elevation:
                                                   WidgetStateProperty.all(8),
@@ -603,7 +656,7 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                               ),
                                               child: TextField(
                                                 controller:
-                                                    question['optionControllers'][entry
+                                                    _optionControllers[index][entry
                                                         .key],
                                                 enabled:
                                                     question['type'] !=
@@ -747,29 +800,31 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                             ),
                                             dropdownMenuEntries: List.generate(
                                               options.length,
-                                              (i) => DropdownMenuEntry(
-                                                value:
-                                                    question['type'] ==
-                                                            'true_false'
-                                                        ? options[i]
-                                                        : 'Option ${i + 1}',
-                                                label:
-                                                    question['type'] ==
-                                                            'true_false'
-                                                        ? options[i]
-                                                        : 'Option ${i + 1}',
-                                                style: ButtonStyle(
-                                                  textStyle:
-                                                      WidgetStateProperty.all(
-                                                        const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16,
-                                                          fontFamily:
-                                                              'Montserrat',
+                                              (i) {
+                                                return DropdownMenuEntry(
+                                                  value:
+                                                      question['type'] ==
+                                                              'true_false'
+                                                          ? options[i]
+                                                          : 'Option ${i + 1}',
+                                                  label:
+                                                      question['type'] ==
+                                                              'true_false'
+                                                          ? options[i]
+                                                          : 'Option ${i + 1}',
+                                                  style: ButtonStyle(
+                                                    textStyle:
+                                                        WidgetStateProperty.all(
+                                                          const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16,
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                          ),
                                                         ),
-                                                      ),
-                                                ),
-                                              ),
+                                                  ),
+                                                );
+                                              },
                                             ),
                                             onSelected: (value) {
                                               setState(() {
@@ -780,7 +835,12 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                             menuStyle: MenuStyle(
                                               backgroundColor:
                                                   WidgetStateProperty.all(
-                                                    const Color(0xFF1A1A1A),
+                                                    const Color.fromARGB(
+                                                      255,
+                                                      255,
+                                                      255,
+                                                      255,
+                                                    ),
                                                   ),
                                               elevation:
                                                   WidgetStateProperty.all(8),
@@ -794,34 +854,6 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                               ),
                             );
                           },
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton(
-                        onPressed: () {
-                          _addQuestion();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 16,
-                          ),
-                          elevation: 8,
-                          shadowColor: Colors.green.withOpacity(0.5),
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                        child: const Text(
-                          'Add New Question',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Montserrat',
-                          ),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -864,20 +896,6 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                     Fluttertoast.showToast(
                                       msg:
                                           'Please fill all questions and options',
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                    );
-                                    return;
-                                  }
-                                  if (_questions.any(
-                                    (q) =>
-                                        !q['options'].contains(
-                                          q['correctAnswer'],
-                                        ),
-                                  )) {
-                                    Fluttertoast.showToast(
-                                      msg:
-                                          'Please select a valid correct answer',
                                       backgroundColor: Colors.red,
                                       textColor: Colors.white,
                                     );
@@ -1025,9 +1043,11 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
     _subjectController.dispose();
     _topicController.dispose();
     _attemptLimitController.dispose();
-    for (var question in _questions) {
-      question['controller'].dispose();
-      for (var controller in question['optionControllers']) {
+    for (var controller in _questionControllers) {
+      controller.dispose();
+    }
+    for (var controllers in _optionControllers) {
+      for (var controller in controllers) {
         controller.dispose();
       }
     }

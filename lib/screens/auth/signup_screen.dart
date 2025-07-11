@@ -18,6 +18,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   String? _selectedRole;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -28,14 +29,23 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<firebase_auth_provider.UserCredential> signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn(
         clientId:
-            '527365810877-con3t0b4s54ibgasvhcldg36t47esupo.apps.googleusercontent.com', // Explicit client ID
+            '527365810877-con3t0b4s54ibgasvhcldg36t47esupo.apps.googleusercontent.com',
       );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        throw Exception('Google sign-in cancelled');
+      }
       final GoogleSignInAuthentication googleAuth =
-          await googleUser!.authentication;
+          await googleUser.authentication;
       final credential = firebase_auth_provider.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -43,6 +53,9 @@ class _SignupScreenState extends State<SignupScreen> {
       return await firebase_auth_provider.FirebaseAuth.instance
           .signInWithCredential(credential);
     } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
       Fluttertoast.showToast(
         msg: 'Google sign-in failed: $e',
         backgroundColor: Colors.red,
@@ -260,9 +273,20 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 25),
                 ElevatedButton(
                   onPressed:
-                      authProvider.isLoading
+                      _isLoading || authProvider.isLoading
                           ? null
                           : () async {
+                            if (_nameController.text.trim().isEmpty ||
+                                _emailController.text.trim().isEmpty ||
+                                _passwordController.text.trim().isEmpty) {
+                              Fluttertoast.showToast(
+                                msg: 'Please fill all fields',
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0,
+                              );
+                              return;
+                            }
                             if (_selectedRole == null) {
                               Fluttertoast.showToast(
                                 msg: 'Please select a role',
@@ -272,6 +296,9 @@ class _SignupScreenState extends State<SignupScreen> {
                               );
                               return;
                             }
+                            setState(() {
+                              _isLoading = true;
+                            });
                             try {
                               await authProvider.signup(
                                 _emailController.text.trim(),
@@ -292,6 +319,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 );
                               }
                             } catch (e) {
+                              setState(() {
+                                _isLoading = false;
+                              });
                               Fluttertoast.showToast(
                                 msg:
                                     authProvider.errorMessage ??
@@ -313,9 +343,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     minimumSize: const Size(double.infinity, 0),
                   ),
                   child:
-                      authProvider.isLoading
-                          ? const CircularProgressIndicator(
-                            color: Color(0xFF6949FF),
+                      _isLoading
+                          ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
                           )
                           : const Text(
                             'Sign Up',
@@ -328,52 +363,54 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                 ),
                 const SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        try {
-                          final userCredential = await signInWithGoogle();
-                          final user = userCredential.user;
-                          if (user != null && user.email != null) {
-                            Fluttertoast.showToast(
-                              msg:
-                                  'Google login successful! Email: ${user.email}',
-                              backgroundColor: Colors.green,
-                              textColor: Colors.white,
-                              fontSize: 16.0,
-                            );
-                            Navigator.pushReplacementNamed(context, '/home');
-                          }
-                        } catch (e) {
-                          // Error handled in signInWithGoogle
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.g_mobiledata,
-                        color: Color.fromARGB(255, 0, 0, 0),
-                      ),
-                      label: const Text(
-                        'Sign in with Google',
-                        style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          255,
-                          255,
-                          255,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                  ),
-                ),
+                // SizedBox(
+                //   width: double.infinity,
+                //   child: ElevatedButton.icon(
+                //     onPressed:
+                //         _isLoading || authProvider.isLoading
+                //             ? null
+                //             : () async {
+                //               try {
+                //                 final userCredential = await signInWithGoogle();
+                //                 final user = userCredential.user;
+                //                 if (user != null && user.email != null) {
+                //                   Fluttertoast.showToast(
+                //                     msg:
+                //                         'Google login successful! Email: ${user.email}',
+                //                     backgroundColor: Colors.green,
+                //                     textColor: Colors.white,
+                //                     fontSize: 16.0,
+                //                   );
+                //                   Navigator.pushReplacementNamed(
+                //                     context,
+                //                     '/home',
+                //                   );
+                //                 }
+                //               } catch (e) {
+                //                 // Error handled in signInWithGoogle
+                //               } finally {
+                //                 setState(() {
+                //                   _isLoading = false;
+                //                 });
+                //               }
+                //             },
+                //     icon: const Icon(
+                //       Icons.g_mobiledata,
+                //       color: Color.fromARGB(255, 0, 0, 0),
+                //     ),
+                //     label: const Text(
+                //       'Sign in with Google',
+                //       style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                //     ),
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(8),
+                //       ),
+                //       padding: const EdgeInsets.symmetric(vertical: 14),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 15),
                 Center(
                   child: GestureDetector(
