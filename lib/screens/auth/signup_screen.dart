@@ -66,6 +66,10 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  bool _isValidName(String name) {
+    return RegExp(r'^[a-zA-Z][a-zA-Z0-9]*$').hasMatch(name);
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -287,6 +291,16 @@ class _SignupScreenState extends State<SignupScreen> {
                               );
                               return;
                             }
+                            if (!_isValidName(_nameController.text.trim())) {
+                              Fluttertoast.showToast(
+                                msg:
+                                    'Name must start with a letter and can only contain letters and numbers',
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0,
+                              );
+                              return;
+                            }
                             if (_selectedRole == null) {
                               Fluttertoast.showToast(
                                 msg: 'Please select a role',
@@ -362,55 +376,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                 ),
-                const SizedBox(height: 15),
-                // SizedBox(
-                //   width: double.infinity,
-                //   child: ElevatedButton.icon(
-                //     onPressed:
-                //         _isLoading || authProvider.isLoading
-                //             ? null
-                //             : () async {
-                //               try {
-                //                 final userCredential = await signInWithGoogle();
-                //                 final user = userCredential.user;
-                //                 if (user != null && user.email != null) {
-                //                   Fluttertoast.showToast(
-                //                     msg:
-                //                         'Google login successful! Email: ${user.email}',
-                //                     backgroundColor: Colors.green,
-                //                     textColor: Colors.white,
-                //                     fontSize: 16.0,
-                //                   );
-                //                   Navigator.pushReplacementNamed(
-                //                     context,
-                //                     '/home',
-                //                   );
-                //                 }
-                //               } catch (e) {
-                //                 // Error handled in signInWithGoogle
-                //               } finally {
-                //                 setState(() {
-                //                   _isLoading = false;
-                //                 });
-                //               }
-                //             },
-                //     icon: const Icon(
-                //       Icons.g_mobiledata,
-                //       color: Color.fromARGB(255, 0, 0, 0),
-                //     ),
-                //     label: const Text(
-                //       'Sign in with Google',
-                //       style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                //     ),
-                //     style: ElevatedButton.styleFrom(
-                //       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(8),
-                //       ),
-                //       padding: const EdgeInsets.symmetric(vertical: 14),
-                //     ),
-                //   ),
-                // ),
                 const SizedBox(height: 15),
                 Center(
                   child: GestureDetector(

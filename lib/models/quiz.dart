@@ -12,6 +12,7 @@ class Quiz {
   final DateTime createdAt;
   final List<String> submittedUsers;
   final Map<String, int>? attempts;
+  final bool isPublished;
 
   static const List<String> availableSubjects = [
     'Subject',
@@ -45,6 +46,7 @@ class Quiz {
     required this.createdAt,
     required this.submittedUsers,
     this.attempts,
+    required this.isPublished,
   });
 
   factory Quiz.fromJson(Map<String, dynamic> json) {
@@ -81,6 +83,7 @@ class Quiz {
       attempts: (json['attempts'] as Map<String, dynamic>?)?.map(
         (key, value) => MapEntry(key, value as int),
       ),
+      isPublished: json['isPublished'] ?? false,
     );
   }
 
@@ -96,6 +99,7 @@ class Quiz {
     'createdAt': Timestamp.fromDate(createdAt),
     'submittedUsers': submittedUsers,
     'attempts': attempts,
+    'isPublished': isPublished,
   };
 }
 

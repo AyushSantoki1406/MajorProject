@@ -377,7 +377,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                 ),
-                const SizedBox(height: 15),
+                // const SizedBox(height: 15),
                 // SizedBox(
                 //   width: double.infinity,
                 //   child: ElevatedButton.icon(

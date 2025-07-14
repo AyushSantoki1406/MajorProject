@@ -69,8 +69,12 @@ class QuizProvider with ChangeNotifier {
         if (userRole.toLowerCase() == 'instructor') {
           query = query.where('createdBy', isEqualTo: userId);
         } else {
-          query = query.where('assignedTo', arrayContains: userId);
+          query = query
+              .where('assignedTo', arrayContains: userId)
+              .where('isPublished', isEqualTo: true);
         }
+      } else {
+        query = query.where('isPublished', isEqualTo: true);
       }
 
       final querySnapshot = await query.get();
@@ -119,6 +123,7 @@ class QuizProvider with ChangeNotifier {
       final quizRef = _firestore.collection('quizzes').doc();
       final quizData = quiz.toJson();
       quizData['id'] = quizRef.id;
+      quizData['isPublished'] = false; // Default to unpublished
       await quizRef.set(quizData);
       await fetchAllQuizzes();
       _error = null;
@@ -256,12 +261,29 @@ class QuizProvider with ChangeNotifier {
         'assignedTo': quiz.assignedTo,
         'submittedUsers': quiz.submittedUsers,
         'attempts': quiz.attempts,
+        'isPublished': quiz.isPublished,
       });
       await fetchAllQuizzes();
       _error = null;
     } catch (e) {
       _error = e.toString();
       print('Error updating quiz: $e');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  Future<void> publishQuiz(String quizId, bool isPublished) async {
+    try {
+      setLoading(true);
+      await _firestore.collection('quizzes').doc(quizId).update({
+        'isPublished': isPublished,
+      });
+      await fetchAllQuizzes();
+      _error = null;
+    } catch (e) {
+      _error = e.toString();
+      print('Error publishing quiz: $e');
     } finally {
       setLoading(false);
     }

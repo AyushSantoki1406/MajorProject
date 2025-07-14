@@ -333,6 +333,7 @@ class _CreateQuizScreenState extends State<CreateQuizScreen> {
       createdAt: DateTime.now(),
       submittedUsers: [],
       attempts: {},
+      isPublished: false,
     );
 
     try {
@@ -791,7 +792,12 @@ class _CreateQuizScreenState extends State<CreateQuizScreen> {
                                         menuStyle: MenuStyle(
                                           backgroundColor:
                                               WidgetStateProperty.all(
-                                                const Color.fromARGB(255, 255, 255, 255),
+                                                const Color.fromARGB(
+                                                  255,
+                                                  255,
+                                                  255,
+                                                  255,
+                                                ),
                                               ),
                                           elevation: WidgetStateProperty.all(8),
                                         ),
@@ -957,7 +963,12 @@ class _CreateQuizScreenState extends State<CreateQuizScreen> {
                                         menuStyle: MenuStyle(
                                           backgroundColor:
                                               WidgetStateProperty.all(
-                                                const Color.fromARGB(255, 255, 255, 255),
+                                                const Color.fromARGB(
+                                                  255,
+                                                  255,
+                                                  255,
+                                                  255,
+                                                ),
                                               ),
                                           elevation: WidgetStateProperty.all(8),
                                         ),

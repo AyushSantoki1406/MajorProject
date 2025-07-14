@@ -10,7 +10,7 @@ import '../providers/quiz_provider.dart';
 import 'subject_quiz_screen.dart';
 import 'create_quiz_screen.dart';
 import 'instructor_dashboard_screen.dart';
-import 'topic_quiz_selection_screen.dart'; // New import
+import 'topic_quiz_selection_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -116,7 +116,11 @@ class _HomeScreenState extends State<HomeScreen>
 
         final allQuizzes =
             quizProvider.quizzes
-                .where((quiz) => quiz.subject.isNotEmpty)
+                .where(
+                  (quiz) =>
+                      quiz.subject.isNotEmpty &&
+                      (quiz.isPublished || quiz.createdBy == userId),
+                )
                 .toList();
         final myQuizzes =
             isInstructor

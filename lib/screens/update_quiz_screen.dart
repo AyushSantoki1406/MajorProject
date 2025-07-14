@@ -162,6 +162,47 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              widget.quiz.isPublished
+                  ? Icons.visibility_off
+                  : Icons.published_with_changes,
+              color: widget.quiz.isPublished ? Colors.orange : Colors.green,
+            ),
+            onPressed: () async {
+              try {
+                setState(() {
+                  _isLoading = true;
+                });
+                await quizProvider.publishQuiz(
+                  widget.quiz.id,
+                  !widget.quiz.isPublished,
+                );
+                Fluttertoast.showToast(
+                  msg:
+                      widget.quiz.isPublished
+                          ? 'Quiz unpublished successfully!'
+                          : 'Quiz published successfully!',
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                );
+                setState(() {
+                  _isLoading = false;
+                });
+              } catch (e) {
+                setState(() {
+                  _isLoading = false;
+                });
+                Fluttertoast.showToast(
+                  msg: 'Failed to update quiz: $e',
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -579,34 +620,49 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                                     ),
                                                   ];
                                                 } else {
-                                                  // Preserve existing option texts if available
+                                                  // Convert to MCQ, initialize with empty options if none exist
                                                   question['options'] = [
-                                                    _optionControllers[index][0]
-                                                            .text
-                                                            .isNotEmpty
+                                                    _optionControllers[index]
+                                                                .length >
+                                                            0
                                                         ? _optionControllers[index][0]
-                                                            .text
+                                                                .text
+                                                                .isNotEmpty
+                                                            ? _optionControllers[index][0]
+                                                                .text
+                                                            : ''
                                                         : '',
-                                                    _optionControllers[index][1]
-                                                            .text
-                                                            .isNotEmpty
+                                                    _optionControllers[index]
+                                                                .length >
+                                                            1
                                                         ? _optionControllers[index][1]
-                                                            .text
+                                                                .text
+                                                                .isNotEmpty
+                                                            ? _optionControllers[index][1]
+                                                                .text
+                                                            : ''
                                                         : '',
-                                                    _optionControllers[index][2]
-                                                            .text
-                                                            .isNotEmpty
+                                                    _optionControllers[index]
+                                                                .length >
+                                                            2
                                                         ? _optionControllers[index][2]
-                                                            .text
+                                                                .text
+                                                                .isNotEmpty
+                                                            ? _optionControllers[index][2]
+                                                                .text
+                                                            : ''
                                                         : '',
-                                                    _optionControllers[index][3]
-                                                            .text
-                                                            .isNotEmpty
+                                                    _optionControllers[index]
+                                                                .length >
+                                                            3
                                                         ? _optionControllers[index][3]
-                                                            .text
+                                                                .text
+                                                                .isNotEmpty
+                                                            ? _optionControllers[index][3]
+                                                                .text
+                                                            : ''
                                                         : '',
                                                   ];
-                                                  // Set correctAnswer to first non-empty option or 'Option 1' if all empty
                                                   question['correctAnswer'] =
                                                       question['options']
                                                               .asMap()
@@ -617,32 +673,40 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                                                         .value
                                                                         .isNotEmpty,
                                                               )
-                                                          ? 'Option 1'
-                                                          : '';
+                                                          ? question['options']
+                                                              .firstWhere(
+                                                                (opt) =>
+                                                                    opt.isNotEmpty,
+                                                                orElse:
+                                                                    () =>
+                                                                        'Option 1',
+                                                              )
+                                                          : 'Option 1';
                                                   _optionControllers[index] =
                                                       question['options']
-                                                          .asMap()
-                                                          .entries
                                                           .map(
-                                                            (
-                                                              entry,
-                                                            ) => TextEditingController(
-                                                              text: entry.value,
-                                                            ),
+                                                            (opt) =>
+                                                                TextEditingController(
+                                                                  text: opt,
+                                                                ),
                                                           )
                                                           .toList();
+                                                  // Ensure exactly 4 options for MCQ
+                                                  while (_optionControllers[index]
+                                                          .length <
+                                                      4) {
+                                                    _optionControllers[index].add(
+                                                      TextEditingController(),
+                                                    );
+                                                    question['options'].add('');
+                                                  }
                                                 }
                                               });
                                             },
                                             menuStyle: MenuStyle(
                                               backgroundColor:
                                                   WidgetStateProperty.all(
-                                                    const Color.fromARGB(
-                                                      255,
-                                                      255,
-                                                      255,
-                                                      255,
-                                                    ),
+                                                    const Color(0xFF2A2D36),
                                                   ),
                                               elevation:
                                                   WidgetStateProperty.all(8),
@@ -835,12 +899,7 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                             menuStyle: MenuStyle(
                                               backgroundColor:
                                                   WidgetStateProperty.all(
-                                                    const Color.fromARGB(
-                                                      255,
-                                                      255,
-                                                      255,
-                                                      255,
-                                                    ),
+                                                    const Color(0xFF2A2D36),
                                                   ),
                                               elevation:
                                                   WidgetStateProperty.all(8),
@@ -940,6 +999,7 @@ class _UpdateQuizScreenState extends State<UpdateQuizScreen> {
                                     createdAt: widget.quiz.createdAt,
                                     submittedUsers: widget.quiz.submittedUsers,
                                     attempts: widget.quiz.attempts,
+                                    isPublished: widget.quiz.isPublished,
                                   );
 
                                   try {

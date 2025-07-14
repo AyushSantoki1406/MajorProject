@@ -7,8 +7,8 @@ import '../models/quiz.dart';
 import '../providers/auth_provider.dart';
 import '../providers/quiz_provider.dart';
 import 'update_quiz_screen.dart';
-import 'take_quiz_screen.dart'; // Assuming TakeQuizScreen is the intended target
-import 'view_quiz_screen.dart'; // Assuming this needs to be defined or adjusted
+import 'take_quiz_screen.dart';
+import 'view_quiz_screen.dart';
 
 class SubjectQuizScreen extends StatefulWidget {
   final String subject;
@@ -61,23 +61,22 @@ class _SubjectQuizScreenState extends State<SubjectQuizScreen>
   Widget build(BuildContext context) {
     final quizProvider = Provider.of<QuizProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
-    final isInstructor = widget.isInstructor; // Use widget parameter
-    final userId = widget.userId; // Use widget parameter
+    final userId = widget.userId;
 
     final quizzes =
         quizProvider.quizzes
             .where(
               (quiz) =>
                   quiz.subject == widget.subject &&
-                  (widget.topic == null || quiz.topic == widget.topic),
+                  (widget.topic == null || quiz.topic == widget.topic) &&
+                  (quiz.isPublished || quiz.createdBy == userId),
             )
             .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        automaticallyImplyLeading: false, // 👈 Hides the back button
-
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: FadeInDown(
@@ -233,7 +232,7 @@ class _SubjectQuizScreenState extends State<SubjectQuizScreen>
                           child: InkWell(
                             borderRadius: BorderRadius.circular(20),
                             onTap:
-                                canAttempt
+                                canAttempt && quiz.isPublished
                                     ? () {
                                       try {
                                         Navigator.push(
@@ -342,7 +341,7 @@ class _SubjectQuizScreenState extends State<SubjectQuizScreen>
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Attempts: $attemptCount/${quiz.attemptLimit == 0 ? 'Unlimited' : quiz.attemptLimit}',
+                                    'Attempts: $attemptCount/${quiz.attemptLimit == 0 ? "Unlimited" : quiz.attemptLimit}',
                                     style: TextStyle(
                                       color:
                                           canAttempt
@@ -352,7 +351,20 @@ class _SubjectQuizScreenState extends State<SubjectQuizScreen>
                                       fontFamily: 'Montserrat',
                                     ),
                                   ),
-                                  if (isInstructor && quiz.createdBy == userId)
+                                  if (!quiz.isPublished)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        'Unpublished',
+                                        style: TextStyle(
+                                          color: Colors.orange,
+                                          fontSize: 14,
+                                          fontFamily: 'Montserrat',
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ),
+                                  if (quiz.createdBy == userId)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 12.0),
                                       child: Row(
@@ -535,6 +547,87 @@ class _SubjectQuizScreenState extends State<SubjectQuizScreen>
                                                     'Delete',
                                                     style: TextStyle(
                                                       color: Colors.redAccent,
+                                                      fontFamily: 'Montserrat',
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              try {
+                                                await quizProvider.publishQuiz(
+                                                  quiz.id,
+                                                  !quiz.isPublished,
+                                                );
+                                                Fluttertoast.showToast(
+                                                  msg:
+                                                      quiz.isPublished
+                                                          ? 'Quiz unpublished successfully!'
+                                                          : 'Quiz published successfully!',
+                                                  backgroundColor: Colors.green,
+                                                  textColor: Colors.white,
+                                                );
+                                              } catch (e) {
+                                                Fluttertoast.showToast(
+                                                  msg:
+                                                      'Failed to update quiz: $e',
+                                                  backgroundColor: Colors.red,
+                                                  textColor: Colors.white,
+                                                );
+                                              }
+                                            },
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 8,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    quiz.isPublished
+                                                        ? Colors.orange
+                                                            .withOpacity(0.2)
+                                                        : Colors.green
+                                                            .withOpacity(0.2),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                border: Border.all(
+                                                  color:
+                                                      quiz.isPublished
+                                                          ? Colors.orange
+                                                              .withOpacity(0.4)
+                                                          : Colors.green
+                                                              .withOpacity(0.4),
+                                                ),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    quiz.isPublished
+                                                        ? Icons.visibility_off
+                                                        : Icons
+                                                            .published_with_changes,
+                                                    color:
+                                                        quiz.isPublished
+                                                            ? Colors.orange
+                                                            : Colors.green,
+                                                    size: 16,
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    quiz.isPublished
+                                                        ? 'Unpublish'
+                                                        : 'Publish',
+                                                    style: TextStyle(
+                                                      color:
+                                                          quiz.isPublished
+                                                              ? Colors.orange
+                                                              : Colors.green,
                                                       fontFamily: 'Montserrat',
                                                       fontSize: 14,
                                                       fontWeight:
