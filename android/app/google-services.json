@@ -1,0 +1,150 @@
+{
+  "project_info": {
+    "project_number": "527365810877",
+    "project_id": "book-wave-5152c",
+    "storage_bucket": "book-wave-5152c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527365810877:android:05eef107aadb6f3d23a5d4",
+        "android_client_info": {
+          "package_name": "com.example.bookwave"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "527365810877-con3t0b4s54ibgasvhcldg36t47esupo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bookwave",
+            "certificate_hash": "4f5224db5636d9fa93c3eed9ea9b93e5b5a0f9cd"
+          }
+        },
+        {
+          "client_id": "527365810877-beufiu4dgqj890ahsa5bdrd13q1g8q6o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAGNN3b5LkO6hZ5Y8hv0v3raBI1b6DIC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "527365810877-beufiu4dgqj890ahsa5bdrd13q1g8q6o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527365810877:android:53ca1d6290ceaa6223a5d4",
+        "android_client_info": {
+          "package_name": "com.nexquiz.nextquiz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "527365810877-beufiu4dgqj890ahsa5bdrd13q1g8q6o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAGNN3b5LkO6hZ5Y8hv0v3raBI1b6DIC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "527365810877-beufiu4dgqj890ahsa5bdrd13q1g8q6o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527365810877:android:95d3c49ad476a82923a5d4",
+        "android_client_info": {
+          "package_name": "com.quizapp.bookwave"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "527365810877-7bj9ne7mpsqn0ojuk2d9d7r91bj4oo2e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quizapp.bookwave",
+            "certificate_hash": "3f2dff21cf47ffe6a3220be53d9b848c0bcdd6d9"
+          }
+        },
+        {
+          "client_id": "527365810877-beufiu4dgqj890ahsa5bdrd13q1g8q6o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAGNN3b5LkO6hZ5Y8hv0v3raBI1b6DIC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "527365810877-beufiu4dgqj890ahsa5bdrd13q1g8q6o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527365810877:android:8eb80546c24759e723a5d4",
+        "android_client_info": {
+          "package_name": "com.quizapp.bookwave2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "527365810877-3htk6n6l6meedhi37rinrl4gumffss6g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quizapp.bookwave2",
+            "certificate_hash": "3f2dff21cf47ffe6a3220be53d9b848c0bcdd6d9"
+          }
+        },
+        {
+          "client_id": "527365810877-beufiu4dgqj890ahsa5bdrd13q1g8q6o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAGNN3b5LkO6hZ5Y8hv0v3raBI1b6DIC0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "527365810877-beufiu4dgqj890ahsa5bdrd13q1g8q6o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
