@@ -123,9 +123,7 @@ class _HomeScreenState extends State<HomeScreen>
                 )
                 .toList();
         final myQuizzes =
-            isInstructor
-                ? allQuizzes.where((quiz) => quiz.createdBy == userId).toList()
-                : [];
+            allQuizzes.where((quiz) => quiz.createdBy == userId).toList();
         final allSubjects =
             allQuizzes
                 .map((quiz) => quiz.subject)
@@ -138,6 +136,13 @@ class _HomeScreenState extends State<HomeScreen>
                 .toSet()
                 .toList()
                 .cast<String>();
+
+        // Debug: Log the number of quizzes to check if myQuizzes is populated
+        if (myQuizzes.isEmpty) {
+          print('No quizzes found for userId: $userId');
+        } else {
+          print('Found ${myQuizzes.length} quizzes for userId: $userId');
+        }
 
         // Group quizzes by subject and then by topic
         final subjectTopicMap = <String, Map<String, List<Quiz>>>{};
@@ -250,9 +255,33 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           ],
                         ),
-                        if (isInstructor)
-                          Row(
-                            children: [
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const CreateQuizScreen(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withOpacity(0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  color: primaryColor,
+                                  size: 24,
+                                ),
+                              ),
+                            ),
+                            if (isInstructor) const SizedBox(width: 8),
+                            if (isInstructor)
                               GestureDetector(
                                 onTap: () {
                                   Navigator.push(
@@ -277,8 +306,8 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -343,40 +372,38 @@ class _HomeScreenState extends State<HomeScreen>
                                     fontFamily: 'Montserrat',
                                   ),
                                 ),
-                                if (isInstructor) ...[
-                                  const SizedBox(height: 16),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  const CreateQuizScreen(),
-                                        ),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: primaryColor,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 24,
-                                        vertical: 12,
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                const CreateQuizScreen(),
                                       ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryColor,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 12,
                                     ),
-                                    child: const Text(
-                                      'Create a Quiz',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'Montserrat',
-                                      ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                ],
+                                  child: const Text(
+                                    'Create a Quiz',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           )
@@ -410,34 +437,90 @@ class _HomeScreenState extends State<HomeScreen>
                                   isInstructor,
                                   userId,
                                 ),
-                                if (isInstructor && mySubjects.isNotEmpty) ...[
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 20,
-                                      top: 20,
-                                      bottom: 10,
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 20,
+                                    top: 20,
+                                    bottom: 10,
+                                  ),
+                                  child: const Text(
+                                    'My Created Quizzes',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'Montserrat',
                                     ),
-                                    child: const Text(
-                                      'My Created Quizzes',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: 'Montserrat',
+                                  ),
+                                ),
+                                myQuizzes.isEmpty
+                                    ? Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Column(
+                                        children: [
+                                          Icon(
+                                            Icons.quiz,
+                                            color: primaryColor.withOpacity(
+                                              0.6,
+                                            ),
+                                            size: 64,
+                                          ),
+                                          const SizedBox(height: 16),
+                                          const Text(
+                                            'No quizzes created yet',
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 18,
+                                              fontFamily: 'Montserrat',
+                                            ),
+                                          ),
+                                          const SizedBox(height: 16),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (context) =>
+                                                          const CreateQuizScreen(),
+                                                ),
+                                              );
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: primaryColor,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 24,
+                                                    vertical: 12,
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              'Create a Quiz',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                fontFamily: 'Montserrat',
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                    )
+                                    : _buildSubjectGrid(
+                                      context,
+                                      mySubjects,
+                                      mySubjectTopicMap,
+                                      subjectIcons,
+                                      primaryColor,
+                                      _fadeAnimation,
+                                      isInstructor,
+                                      userId,
                                     ),
-                                  ),
-                                  _buildSubjectGrid(
-                                    context,
-                                    mySubjects,
-                                    mySubjectTopicMap,
-                                    subjectIcons,
-                                    primaryColor,
-                                    _fadeAnimation,
-                                    isInstructor,
-                                    userId,
-                                  ),
-                                ],
                               ],
                             ),
                           ),

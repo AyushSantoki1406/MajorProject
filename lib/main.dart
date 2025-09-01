@@ -21,11 +21,9 @@ const FirebaseOptions firebaseOptions = FirebaseOptions(
   storageBucket: "book-wave-5152c.appspot.com",
   messagingSenderId: "527365810877",
   appId: "1:527365810877:android:95d3c49ad476a82923a5d4",
-  measurementId:
-      "G-16ZN3L4H81", // Optional; remove if not using Google Analytics
+  measurementId: "G-16ZN3L4H81",
 );
 
-/// 🔹 Background FCM handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Firebase.apps.isEmpty) {
@@ -96,10 +94,10 @@ class TabNavigator extends StatefulWidget {
   const TabNavigator({Key? key}) : super(key: key);
 
   @override
-  _TabNavigatorState createState() => _TabNavigatorState();
+  TabNavigatorState createState() => TabNavigatorState(); // Changed to public
 }
 
-class _TabNavigatorState extends State<TabNavigator>
+class TabNavigatorState extends State<TabNavigator>
     with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   late AnimationController _animationController;

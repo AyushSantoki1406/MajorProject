@@ -19,7 +19,7 @@ class InstructorDashboardScreen extends StatefulWidget {
 class _InstructorDashboardScreenState extends State<InstructorDashboardScreen> {
   final Map<String, String> _studentNameCache = {};
   // Add a flag to control "Coming Soon" display (adjust as needed)
-  final bool _isComingSoon = true; // Set to false to show original UI
+  final bool _isComingSoon = false; // Set to false to show original UI
 
   @override
   Widget build(BuildContext context) {

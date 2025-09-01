@@ -22,8 +22,7 @@ class _LibraryScreenState extends State<LibraryScreen>
   late AnimationController _controller;
   late Animation<double> _animation;
   final Color primaryColor = const Color(0xFF7C4DFF);
-  // Add a flag to control "Coming Soon" display (adjust as needed)
-  final bool _isComingSoon = true; // Set to false to show original UI
+  final bool _isComingSoon = false;
 
   @override
   void initState() {
@@ -48,12 +47,10 @@ class _LibraryScreenState extends State<LibraryScreen>
     final authProvider = Provider.of<AuthProvider>(context);
     final userId = authProvider.user!.uid;
 
-    // Check if "Coming Soon" should be displayed
     if (_isComingSoon) {
       return Scaffold(
         body: Stack(
           children: [
-            // Blurred background with the original content
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -67,7 +64,6 @@ class _LibraryScreenState extends State<LibraryScreen>
                 child: Container(color: Colors.black.withOpacity(0.2)),
               ),
             ),
-            // Coming Soon content
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -100,11 +96,10 @@ class _LibraryScreenState extends State<LibraryScreen>
       );
     }
 
-    // Original UI (unchanged)
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        automaticallyImplyLeading: false, // 👈 Hides the back button
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: FadeInDown(
@@ -194,7 +189,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                                   elevation: 5,
                                 ),
                                 onPressed: () {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => const HomeScreen(),
@@ -269,7 +264,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                                   elevation: 5,
                                 ),
                                 onPressed: () {
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => const HomeScreen(),
@@ -516,8 +511,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                                                                   height: 8,
                                                                 ),
                                                                 SizedBox(
-                                                                  height:
-                                                                      200, // Fixed height to prevent size errors
+                                                                  height: 200,
                                                                   child: BarChart(
                                                                     BarChartData(
                                                                       alignment:
@@ -802,7 +796,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                                                                           5,
                                                                     ),
                                                                     onPressed: () {
-                                                                      Navigator.pushReplacement(
+                                                                      Navigator.push(
                                                                         context,
                                                                         MaterialPageRoute(
                                                                           builder:
@@ -841,10 +835,10 @@ class _LibraryScreenState extends State<LibraryScreen>
                                                           ),
                                                         ),
                                                       );
-                                                    }).toList(),
+                                                    }).toList(), // Convert Iterable to List
                                               ),
                                             );
-                                          }).toList(),
+                                          }).toList(), // Convert Iterable to List
                                     ),
                                   ),
                                 ),
